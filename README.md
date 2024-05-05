@@ -15,6 +15,12 @@
 - Fenetre pop up avec la liste des commandes
 
 
+## Commandes utilisés 
+npx create-react-app composant-terminal
+cd composant-terminal
+npm install @xterm/xterm axios
+
+
 ## Bibliothèques / API / outils utilisées
 
 A remplir

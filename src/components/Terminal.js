@@ -66,9 +66,10 @@ const TerminalComponent = () => {
     };
   }, [terminalActive]);
 
-  const handleCommand = async (command) => {
+  const handleCommand = async (input) => {
+    const [command, ...args] = input.split(' ');
     try {
-      const response = await axios.post('http://localhost:5000/command', { command });
+      const response = await axios.post('http://localhost:5000/command', { command, args });
       terminal.current.write(response.data);
     } catch (error) {
       terminal.current.write(`\r Error: ${error.message}`);

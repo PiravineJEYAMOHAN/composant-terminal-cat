@@ -7,7 +7,7 @@ import CommandListPopup from './CommandListPopup';
 const TerminalComponent = () => {
   const terminalRef = useRef(null);
   const [showHelp, setShowHelp] = useState(false);
-  const terminalActive = true;
+  const terminalActive = useRef(true);
   const terminal = useRef(null);
   const commandBuffer = useRef('');
   const commandHistory = useRef([]);
@@ -21,10 +21,11 @@ const TerminalComponent = () => {
     terminal.current.onKey(e => {
       const printable = !e.domEvent.altKey && !e.domEvent.ctrlKey && !e.domEvent.metaKey;
 
-      if (terminalActive) {
+      if (terminalActive.current) {
         if (e.domEvent.keyCode === 13) {
           terminal.current.write('\r\n');
           handleCommand(commandBuffer.current.trim());
+          terminalActive.current = false;
           updatePrompt();
           if (commandBuffer.current.trim() !== '') {
             commandHistory.current.push(commandBuffer.current);
@@ -64,7 +65,7 @@ const TerminalComponent = () => {
     return () => {
       terminal.current.dispose();
     };
-  }, [terminalActive]);
+  }, []);
 
   const handleCommand = async (input) => {
     const [command, ...args] = input.split(' ');
@@ -74,11 +75,14 @@ const TerminalComponent = () => {
     } catch (error) {
       terminal.current.write(`\r Error: ${error.message}`);
       updatePrompt();
+    } finally {
+      terminalActive.current = true;
+      updatePrompt();
     }
   };
 
   const updatePrompt = () => {
-    if (terminalActive) {
+    if (terminalActive.current) {
       terminal.current.write('\r\n$ ');
     } else {
       terminal.current.write('\r\n');
@@ -86,7 +90,7 @@ const TerminalComponent = () => {
   };
 
   const handleKeyPress = (e) => {
-    if (!terminalActive) {
+    if (!terminalActive.current) {
       e.preventDefault();
     }
   };
@@ -96,7 +100,7 @@ const TerminalComponent = () => {
   };
 
   return (
-    <div>
+    <div style={{ textAlign: 'left' }}>
       <button
         onClick={() => setShowHelp(!showHelp)}
         style={{
@@ -115,7 +119,7 @@ const TerminalComponent = () => {
       <div
         ref={terminalRef}
         onKeyDown={handleKeyPress}
-        tabIndex={terminalActive ? 0 : -1}
+        tabIndex={terminalActive.current ? 0 : -1}
         style={{ outline: 'none' }}
       />
     </div>

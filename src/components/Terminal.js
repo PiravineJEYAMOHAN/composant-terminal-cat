@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Terminal } from '@xterm/xterm';
-import 'xterm/css/xterm.css';
+import '@xterm/xterm/css/xterm.css';
 import axios from 'axios';
 import CommandListPopup from './CommandListPopup';
 

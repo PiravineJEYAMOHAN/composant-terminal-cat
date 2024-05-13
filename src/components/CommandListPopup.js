@@ -17,7 +17,8 @@ const CommandListPopup = () => {
       <h3>Liste des commandes :</h3>
       <ul style={{ padding: 0, margin: 0, listStyle: 'none', textAlign: 'left' }}>
         <li>save [nom_fichier] - Sauvegarde un fichier</li>
-        <li>run - Exécute le code</li>
+        <li>compile [nom_fichier] - Compile le code (crée l'executable en cas de réussite)</li>
+        <li>run [nom_fichier] - Exécute l'executable</li>
         <li>? - Affiche cette liste</li>
       </ul>
     </div>

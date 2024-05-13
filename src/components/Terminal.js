@@ -4,7 +4,7 @@ import '@xterm/xterm/css/xterm.css';
 import axios from 'axios';
 import CommandListPopup from './CommandListPopup';
 
-const TerminalComponent = () => {
+const TerminalComponent = ({ studentId }) => {
   const terminalRef = useRef(null);
   const [showHelp, setShowHelp] = useState(false);
   const terminalActive = useRef(true);
@@ -70,7 +70,7 @@ const TerminalComponent = () => {
   const handleCommand = async (input) => {
     const [command, ...args] = input.split(' ');
     try {
-      const response = await axios.post('http://localhost:5000/command', { command, args });
+      const response = await axios.post('http://localhost:5000/command', { command, args, studentId });
       terminal.current.write(response.data);
     } catch (error) {
       terminal.current.write(`\r Error: ${error.message}`);

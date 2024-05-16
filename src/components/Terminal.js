@@ -111,7 +111,8 @@ const TerminalComponent = ({ studentId }) => {
     return () => {
       terminal.current.dispose();
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [studentId]);
 
   const redrawLine = () => {
     terminal.current.write('\x1b[s'); // Save cursor position
@@ -121,7 +122,6 @@ const TerminalComponent = ({ studentId }) => {
   };
 
   const handleCommand = async (input) => {
-  
     const [command, ...args] = input.split(' ');
 
     try {
@@ -172,7 +172,7 @@ const TerminalComponent = ({ studentId }) => {
           zIndex: '9999'
         }}
       >
-        ?
+        Aide
       </button>
       {showHelp && <CommandListPopup />}
       <div

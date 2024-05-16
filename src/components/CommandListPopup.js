@@ -14,15 +14,26 @@ const CommandListPopup = () => {
         zIndex: '9998'
       }}
     >
-      <h3>Liste des commandes :</h3>
+      <h3>Liste de commandes :</h3>
+      
+      <h4>Compilation et exécution :</h4>
       <ul style={{ padding: 0, margin: 0, listStyle: 'none', textAlign: 'left' }}>
-        <li>save [nom_fichier] - Sauvegarde un fichier</li>
-        <li>compile [nom_fichier] - Compile le code (crée l'executable en cas de réussite)</li>
-        <li>run [nom_fichier] - Exécute l'executable</li>
-        <li>? - Affiche cette liste</li>
+        <li>Compile un fichier C - <code>gcc nom_fichier.c -o nom_executable</code></li>
+        <li>Exécuter un fichier C - <code>./nom_executable</code></li>
+        <li>Exécuter un script Python - <code>python nom_fichier.py</code></li>
+        <li>Exécuter un script Python 3 - <code>python3 nom_fichier.py</code></li>
+        <li>Compiler un fichier Java - <code>javac NomFichier.java</code></li>
+        <li>Exécuter un fichier Java - <code>java NomFichier</code></li>
+      </ul>
+
+      <h4>Navigation et gestion des fichiers :</h4>
+      <ul style={{ padding: 0, margin: 0, listStyle: 'none', textAlign: 'left' }}>
+        <li>Lister les fichiers et répertoires - <code>ls</code></li>
+        <li>Changer de répertoire - <code>cd nom_du_repertoire / cd ..</code></li>
+        <li>Créer un répertoire - <code>mkdir nom_du_repertoire</code></li>
       </ul>
     </div>
   );
 };
 
-export default CommandListPopup
+export default CommandListPopup;

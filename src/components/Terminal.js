@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
-import axios from 'axios';
 import { io } from 'socket.io-client';
 import CommandListPopup from './CommandListPopup';
 
@@ -16,7 +15,6 @@ const TerminalComponent = ({ studentId }) => {
   const historyIndex = useRef(-1);
   const [currentDirectory, setCurrentDirectory] = useState(''); // Start with an empty directory
   const initialized = useRef(false);
-
   const socket = useRef(null);
 
   const updatePrompt = useCallback((directory) => {
@@ -25,12 +23,39 @@ const TerminalComponent = ({ studentId }) => {
   }, [currentDirectory]);
 
   useEffect(() => {
+    socket.current = io('http://localhost:5000');
+
+    socket.current.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    socket.current.on('command_output', (data) => {
+      terminal.current.write(data.output.replace(/\r?\n/g, '\r\n') + '\r\n');
+      if (data.error) {
+        terminal.current.write(data.error.replace(/\r?\n/g, '\r\n') + '\r\n');
+      }
+      if (data.current_directory) {
+        setCurrentDirectory(data.current_directory);
+        updatePrompt(data.current_directory);
+      } else {
+        updatePrompt();
+      }
+      terminalActive.current = true;
+    });
+
     const fetchCurrentDirectory = async () => {
       try {
-        const response = await axios.post('http://localhost:5000/init', { studentId });
-        if (response.data.current_directory) {
-          setCurrentDirectory(response.data.current_directory);
-          updatePrompt(response.data.current_directory);
+        const response = await fetch('http://localhost:5000/init', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ studentId })
+        });
+        const data = await response.json();
+        if (data.current_directory) {
+          setCurrentDirectory(data.current_directory);
+          updatePrompt(data.current_directory);
         }
       } catch (error) {
         console.error('Error fetching current directory:', error);
@@ -39,29 +64,10 @@ const TerminalComponent = ({ studentId }) => {
 
     terminal.current = new Terminal();
     terminal.current.open(terminalRef.current);
-    if (!initialized.current) {
-      fetchCurrentDirectory(); // Fetch the current directory when the component mounts
+    if(!initialized.current) {
+      fetchCurrentDirectory();
       initialized.current = true;
     }
-
-    socket.current = io('http://localhost:5000');
-    socket.current.on('connect', () => {
-      console.log('WebSocket connected');
-    });
-
-    socket.current.on('command_output', (data) => {
-      if (data.student_id === studentId) {
-        if (data.output) {
-          terminal.current.write(data.output.replace(/\r?\n/g, '\r\n') + '\r\n');
-        }
-        if (data.error) {
-          terminal.current.write(data.error.replace(/\r?\n/g, '\r\n') + '\r\n');
-        }
-        setCurrentDirectory(data.current_directory);
-        updatePrompt(data.current_directory);
-        terminalActive.current = true;
-      }
-    });
 
     terminal.current.onKey(e => {
       const printable = !e.domEvent.altKey && !e.domEvent.ctrlKey && !e.domEvent.metaKey;
@@ -130,11 +136,11 @@ const TerminalComponent = ({ studentId }) => {
     });
 
     return () => {
-      socket.current.disconnect();
       terminal.current.dispose();
+      socket.current.disconnect();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [studentId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [studentId]);
 
   const redrawLine = () => {
     terminal.current.write('\x1b[s'); // Save cursor position
@@ -143,16 +149,9 @@ const TerminalComponent = ({ studentId }) => {
     terminal.current.write('\x1b[u'); // Restore cursor position
   };
 
-  const handleCommand = async (input) => {
+  const handleCommand = (input) => {
     const [command, ...args] = input.split(' ');
-
-    try {
-      await axios.post('http://localhost:5000/command', { command, args, studentId });
-    } catch (error) {
-      terminal.current.write(`\r\nError: ${error.message}`);
-      updatePrompt();
-      terminalActive.current = true;
-    }
+    socket.current.emit('execute_command', { command, args, studentId });
   };
 
   const handleKeyPress = (e) => {
@@ -174,8 +173,7 @@ const TerminalComponent = ({ studentId }) => {
           top: '10px',
           right: '10px',
           backgroundColor: 'transparent',
-          border: '1px solid #000',
-          padding: '5px 10px',
+          border: 'none',
           cursor: 'pointer',
           zIndex: '9999'
         }}
@@ -187,7 +185,7 @@ const TerminalComponent = ({ studentId }) => {
         ref={terminalRef}
         onKeyDown={handleKeyPress}
         tabIndex={0}
-        style={{ outline: 'none', height: '100vh' }}
+        style={{ outline: 'none' }}
       />
     </div>
   );

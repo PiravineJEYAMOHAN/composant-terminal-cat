@@ -166,7 +166,6 @@ const TerminalComponent = ({ studentId }) => {
           position: 'absolute',
           top: '10px',
           right: '10px',
-          backgroundColor: 'transparent',
           border: 'none',
           cursor: 'pointer',
           zIndex: '9999'

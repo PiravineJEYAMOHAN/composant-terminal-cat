@@ -22,22 +22,40 @@ cd composant-terminal
 
 npm install @xterm/xterm axios
 
+npm install socket.io-client
 
 
-## Execution en local 
-S'assurer qu'on envoie les commandes à l'URL : http://localhost:5000/command (ligne 76 du Terminal.JS)
 
-Faire la commande npm start à la racine du projet après s'être assuré qu'à la ligne 76 du terminal JS, l'URL renseigné est le suivant : 
 
-## Execution avec docker 
-S'assurer qu'on envoie les commandes à l'URL : http://host.docker.internal:5000/command (ligne 76 du Terminal.JS)
+## Execution (du terminal et du serveur à la fois)
+- Ouvrir Docker Desktop
+- Cloner le projet composant-terminal-cat dans un dossier nommé par exemple CAT, cloner aussi le projet serveur-flask-cat dans ce dossier CAT
+- Créer dans le dossier CAT un fichier nommé docker-compose.yml avec le contenu suivant : 
+version: '3.8'
 
-Faire les commandes : 
+services:
+  server:
+    build:
+      context: ./serveur-flask-cat
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./serveur-flask-cat:/app
+      - ./dossier_etudiant:/app/dossier_etudiant
+    environment:
+      - FLASK_ENV=development
 
-docker build -t composant-terminal-cat .
+  terminal:
+    build:
+      context: ./composant-terminal-cat
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./composant-terminal-cat:/app
 
-docker run -p 3000:3000 composant-terminal-cat
-
+- faire les commandes (depuis le dossier CAT) : docker-compose build puis docker-compose up
 
 
 ## Bibliothèques / API / outils utilisées

@@ -1,20 +1,19 @@
-# Utilisez une image Node officielle en tant qu'image parent
-FROM node:14
+# Dockerfile for React terminal
+FROM node:16-slim
 
-# Définissez le répertoire de travail dans le conteneur
+# Set working directory
 WORKDIR /app
 
-# Copiez le fichier package.json dans le répertoire de travail du conteneur
-COPY package*.json ./
-
-# Installez les dépendances
+# Copy package.json and install dependencies
+COPY package.json .
+COPY package-lock.json .
 RUN npm install
 
-# Copiez le reste des fichiers dans le répertoire de travail du conteneur
+# Copy the rest of the application
 COPY . .
 
-# Construisez l'application React
-RUN npm run build
+# Expose the port the app runs on
+EXPOSE 3000
 
-# Commande à exécuter à la mise en marche du conteneur
+# Start the application
 CMD ["npm", "start"]

@@ -24,6 +24,9 @@ npm install @xterm/xterm axios
 
 npm install socket.io-client
 
+npm install @chakra-ui/react
+
+
 
 
 
@@ -43,6 +46,7 @@ services:
     volumes:
       - ./serveur-flask-cat:/app
       - ./dossier_etudiant:/app/dossier_etudiant
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - FLASK_ENV=development
 
@@ -54,6 +58,7 @@ services:
       - "3000:3000"
     volumes:
       - ./composant-terminal-cat:/app
+
 
 - faire les commandes (depuis le dossier CAT) : docker-compose build puis docker-compose up
 

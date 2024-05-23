@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { io } from 'socket.io-client';
@@ -13,14 +13,14 @@ const TerminalComponent = ({ studentId }) => {
   const cursorPosition = useRef(0);
   const commandHistory = useRef([]);
   const historyIndex = useRef(-1);
-  const [currentDirectory, setCurrentDirectory] = useState(''); // Start with an empty directory
+  const [currentDirectory, setCurrentDirectory] = useState('');
   const initialized = useRef(false);
   const socket = useRef(null);
 
-  const updatePrompt = useCallback((directory) => {
+  const updatePrompt = (directory) => {
     const promptDirectory = directory || currentDirectory;
     terminal.current.write(`\r\n\x1b[92m${promptDirectory} $ \x1b[0m`);
-  }, [currentDirectory]);
+  };
 
   useEffect(() => {
     socket.current = io('http://localhost:5000');
@@ -29,18 +29,32 @@ const TerminalComponent = ({ studentId }) => {
       console.log('Connected to server');
     });
 
+    socket.current.on('disconnect', () => {
+      console.log('Disconnected from server');
+    });
+
     socket.current.on('command_output', (data) => {
-      terminal.current.write(data.output.replace(/\r?\n/g, '\r\n') + '\r\n');
-      if (data.error) {
-        terminal.current.write(data.error.replace(/\r?\n/g, '\r\n') + '\r\n');
-      }
-      if (data.current_directory) {
-        setCurrentDirectory(data.current_directory);
-        updatePrompt(data.current_directory);
+      console.log('Received command_output:', data);  // Log received data
+      if (data.message) {
+        console.log('Execution message:', data.message);  // Log execution message
+        terminal.current.write(data.message.replace(/\r?\n/g, '\r\n') + '\r\n');
       } else {
-        updatePrompt();
+        if (data.output) {
+          console.log('Command output:', data.output);  // Log command output
+          terminal.current.write(data.output.replace(/\r?\n/g, '\r\n') + '\r\n');
+        }
+        if (data.error) {
+          console.log('Command error:', data.error);  // Log command error
+          terminal.current.write(data.error.replace(/\r?\n/g, '\r\n') + '\r\n');
+        }
+        if (data.current_directory) {
+          setCurrentDirectory(data.current_directory);
+          updatePrompt(data.current_directory);
+        } else {
+          updatePrompt();
+        }
+        terminalActive.current = true;
       }
-      terminalActive.current = true;
     });
 
     const fetchCurrentDirectory = async () => {
@@ -64,7 +78,7 @@ const TerminalComponent = ({ studentId }) => {
 
     terminal.current = new Terminal();
     terminal.current.open(terminalRef.current);
-    if(!initialized.current) {
+    if (!initialized.current) {
       fetchCurrentDirectory();
       initialized.current = true;
     }
@@ -139,8 +153,8 @@ const TerminalComponent = ({ studentId }) => {
       terminal.current.dispose();
       socket.current.disconnect();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [studentId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [studentId]);
 
   const redrawLine = () => {
     terminal.current.write('\x1b[s'); // Save cursor position
@@ -151,6 +165,7 @@ const TerminalComponent = ({ studentId }) => {
 
   const handleCommand = (input) => {
     const [command, ...args] = input.split(' ');
+    console.log('Emitting execute_command:', { command, args, studentId });  // Log emitted command
     socket.current.emit('execute_command', { command, args, studentId });
   };
 

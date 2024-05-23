@@ -26,7 +26,7 @@ function App() {
         </form>
       ) : (
         <>
-          <h1>Composant Terminal</h1>
+          <h1>Terminal</h1>
           <div className="TerminalContainer">
             <Terminal studentId={studentId} />
           </div>

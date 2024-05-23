@@ -57,6 +57,11 @@ const TerminalComponent = ({ studentId }) => {
       }
     });
 
+    socket.current.on('queue_position', (data) => {
+      console.log('Received queue_position:', data);
+      terminal.current.write(`\r\n\x1b[93mYour position in the queue: ${data.position}\x1b[0m\r\n`);
+    });
+
     const fetchCurrentDirectory = async () => {
       try {
         const response = await fetch('http://localhost:5000/init', {

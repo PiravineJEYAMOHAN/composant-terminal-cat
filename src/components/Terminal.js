@@ -2,18 +2,16 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { io } from 'socket.io-client';
-import CommandListPopup from './CommandListPopup';
 
 const TerminalComponent = ({ studentId }) => {
   const terminalRef = useRef(null);
-  const [showHelp, setShowHelp] = useState(false);
+  const [currentDirectory, setCurrentDirectory] = useState('');
   const terminalActive = useRef(true);
   const terminal = useRef(null);
   const commandBuffer = useRef('');
   const cursorPosition = useRef(0);
   const commandHistory = useRef([]);
   const historyIndex = useRef(-1);
-  const [currentDirectory, setCurrentDirectory] = useState('');
   const initialized = useRef(false);
   const socket = useRef(null);
 
@@ -26,7 +24,7 @@ const TerminalComponent = ({ studentId }) => {
     socket.current = io('http://localhost:5000');
 
     socket.current.on('connect', () => {
-      console.log('Connected to server');
+      console.log('Connected to server'); 
     });
 
     socket.current.on('disconnect', () => {
@@ -185,29 +183,12 @@ const TerminalComponent = ({ studentId }) => {
   };
 
   return (
-    <div style={{ textAlign: 'left' }}>
-      <button
-        onClick={() => setShowHelp(!showHelp)}
-        style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          backgroundColor: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          zIndex: '9999'
-        }}
-      >
-        Aide
-      </button>
-      {showHelp && <CommandListPopup />}
-      <div
-        ref={terminalRef}
-        onKeyDown={handleKeyPress}
-        tabIndex={0}
-        style={{ outline: 'none' }}
-      />
-    </div>
+    <div
+      ref={terminalRef}
+      onKeyDown={handleKeyPress}
+      tabIndex={0}
+      style={{ outline: 'none', textAlign: 'left' }}
+    />
   );
 };
 

@@ -1,6 +1,10 @@
 import React from 'react';
+import settings from '../config/settings';
+import { commands, commonCommands } from '../config/helpCommands';
 
 const CommandListPopup = () => {
+  const languageCommands = commands[settings.language] || [];
+
   return (
     <div
       style={{
@@ -11,26 +15,27 @@ const CommandListPopup = () => {
         border: '1px solid #ccc',
         padding: '10px',
         borderRadius: '5px',
-        zIndex: '9998'
+        zIndex: '9998',
       }}
     >
       <h3>Liste de commandes :</h3>
       
       <h4>Compilation et exécution :</h4>
       <ul style={{ padding: 0, margin: 0, listStyle: 'none', textAlign: 'left' }}>
-        <li>Compile un fichier C - <code>gcc nom_fichier.c -o nom_executable</code></li>
-        <li>Exécuter un fichier C - <code>./nom_executable</code></li>
-        <li>Exécuter un script Python - <code>python nom_fichier.py</code></li>
-        <li>Exécuter un script Python 3 - <code>python3 nom_fichier.py</code></li>
-        <li>Compiler un fichier Java - <code>javac NomFichier.java</code></li>
-        <li>Exécuter un fichier Java - <code>java NomFichier</code></li>
+        {languageCommands.map((cmd, index) => (
+          <li key={index}>
+            {cmd.description} - <code>{cmd.command}</code>
+          </li>
+        ))}
       </ul>
 
       <h4>Navigation et gestion des fichiers :</h4>
       <ul style={{ padding: 0, margin: 0, listStyle: 'none', textAlign: 'left' }}>
-        <li>Lister les fichiers et répertoires - <code>ls</code></li>
-        <li>Changer de répertoire - <code>cd nom_du_repertoire / cd ..</code></li>
-        <li>Créer un répertoire - <code>mkdir nom_du_repertoire</code></li>
+        {commonCommands.map((cmd, index) => (
+          <li key={index}>
+            {cmd.description} - <code>{cmd.command}</code>
+          </li>
+        ))}
       </ul>
     </div>
   );

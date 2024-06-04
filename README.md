@@ -23,6 +23,7 @@
 - Cloner le projet composant-terminal-cat dans un dossier nommé CAT, cloner aussi le projet serveur-flask-cat dans ce dossier CAT
 - Créer dans le dossier CAT un fichier nommé docker-compose.yml avec le contenu suivant : 
 
+```yaml
 version: '3'
 services:
   server:

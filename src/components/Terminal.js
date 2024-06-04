@@ -2,16 +2,19 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { io } from 'socket.io-client';
+import settings from '../config/settings';
+import CommandListPopup from './CommandListPopup';
 
 const TerminalComponent = ({ studentId }) => {
   const terminalRef = useRef(null);
-  const [currentDirectory, setCurrentDirectory] = useState('');
+  const [showHelp, setShowHelp] = useState(false);
   const terminalActive = useRef(true);
   const terminal = useRef(null);
   const commandBuffer = useRef('');
   const cursorPosition = useRef(0);
   const commandHistory = useRef([]);
   const historyIndex = useRef(-1);
+  const [currentDirectory, setCurrentDirectory] = useState('');
   const initialized = useRef(false);
   const socket = useRef(null);
 
@@ -67,7 +70,7 @@ const TerminalComponent = ({ studentId }) => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ studentId })
+          body: JSON.stringify({ studentId, language: settings.language })
         });
         const data = await response.json();
         if (data.current_directory) {
@@ -183,12 +186,14 @@ const TerminalComponent = ({ studentId }) => {
   };
 
   return (
-    <div
-      ref={terminalRef}
-      onKeyDown={handleKeyPress}
-      tabIndex={0}
-      style={{ outline: 'none', textAlign: 'left' }}
-    />
+    <div style={{ textAlign: 'left' }}>
+      <div
+        ref={terminalRef}
+        onKeyDown={handleKeyPress}
+        tabIndex={0}
+        style={{ outline: 'none' }}
+      />
+    </div>
   );
 };
 

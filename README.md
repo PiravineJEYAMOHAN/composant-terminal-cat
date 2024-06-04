@@ -8,14 +8,56 @@
 
 ## Fonctionnalités
 
-> La plupart des fonctionnalités sont encore en cours de développement 
-
-- Ecriture de commande \[en cours]
-- Envoie de commande à un serveur FLASK \[en cours]
+- Ecriture de commande 
+- Envoie de commande à un serveur FLASK 
 - Fenetre pop up avec la liste des commandes
+- dossier et fichiers de configurations du terminal
+
+## Dépot du serveur lié à ce terminal 
+
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=PiravineJEYAMOHAN&repo=serveur-flask-cat&border_color=7F3FBF&bg_color=0D1117&title_color=C9D1D9&text_color=8B949E&icon_color=7F3FBF)](https://github.com/PiravineJEYAMOHAN/serveur-flask-cat)
 
 
-## Commandes utilisés 
+## Execution (du terminal et du serveur à la fois)
+- Ouvrir Docker Desktop
+- Cloner le projet composant-terminal-cat dans un dossier nommé CAT, cloner aussi le projet serveur-flask-cat dans ce dossier CAT
+- Créer dans le dossier CAT un fichier nommé docker-compose.yml avec le contenu suivant : 
+
+version: '3'
+services:
+  server:
+    build: ./serveur-flask-cat
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./serveur-flask-cat/config:/app/config
+      - ./dossier_etudiant:/app/dossier_etudiant
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - default
+    environment:
+      - DOCKER_BUILDKIT=1
+
+  terminal:
+    build: ./composant-terminal-cat
+    ports:
+      - "3000:3000"
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
+
+
+
+- faire les commandes (depuis le dossier CAT) : 
+docker-compose build 
+docker-compose up
+
+
+
+## Commandes utilisés (non nécessaire avec docker)
 npx create-react-app composant-terminal
 
 cd composant-terminal
@@ -25,42 +67,6 @@ npm install @xterm/xterm axios
 npm install socket.io-client
 
 npm install @chakra-ui/react
-
-
-
-
-
-## Execution (du terminal et du serveur à la fois)
-- Ouvrir Docker Desktop
-- Cloner le projet composant-terminal-cat dans un dossier nommé par exemple CAT, cloner aussi le projet serveur-flask-cat dans ce dossier CAT
-- Créer dans le dossier CAT un fichier nommé docker-compose.yml avec le contenu suivant : 
-version: '3.8'
-
-services:
-  server:
-    build:
-      context: ./serveur-flask-cat
-      dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./serveur-flask-cat:/app
-      - ./dossier_etudiant:/app/dossier_etudiant
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - FLASK_ENV=development
-
-  terminal:
-    build:
-      context: ./composant-terminal-cat
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./composant-terminal-cat:/app
-
-
-- faire les commandes (depuis le dossier CAT) : docker-compose build puis docker-compose up
 
 
 ## Bibliothèques / API / outils utilisées

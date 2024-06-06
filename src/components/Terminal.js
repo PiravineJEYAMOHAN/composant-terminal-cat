@@ -33,30 +33,29 @@ const TerminalComponent = ({ studentId }) => {
     });
 
     socket.current.on('command_output', (data) => {
-        console.log('Received command_output:', data);  // Log received data
-        
-          if (data.message) {
-            console.log('Execution message:', data.message);  // Log execution message
-            terminal.current.write(data.message.replace(/\r?\n/g, '\r\n') + '\r\n');
-          } else {
-            if (data.output) {
-              console.log('Command output:', data.output);  // Log command output
-              terminal.current.write(data.output.replace(/\r?\n/g, '\r\n') + '\r\n');
-            }
-            if (data.error) {
-              console.log('Command error:', data.error);  // Log command error
-              terminal.current.write(data.error.replace(/\r?\n/g, '\r\n') + '\r\n');
-            }
-            if (data.current_directory) {
-              setCurrentDirectory(data.current_directory);
-              updatePrompt(data.current_directory);
-            } else {
-              updatePrompt();
-            }
-            terminalActive.current = true;
-          }
-    }
-    );
+      console.log('Received command_output:', data);
+
+      if (data.message) {
+        console.log('Execution message:', data.message);
+        terminal.current.write(data.message.replace(/\r?\n/g, '\r\n') + '\r\n');
+      } else {
+        if (data.output) {
+          console.log('Command output:', data.output);
+          terminal.current.write(data.output.replace(/\r?\n/g, '\r\n') + '\r\n');
+        }
+        if (data.error) {
+          console.log('Command error:', data.error);
+          terminal.current.write(data.error.replace(/\r?\n/g, '\r\n') + '\r\n');
+        }
+        if (data.current_directory) {
+          setCurrentDirectory(data.current_directory);
+          updatePrompt(data.current_directory);
+        } else {
+          updatePrompt();
+        }
+        terminalActive.current = true;
+      }
+    });
 
     socket.current.on('queue_position', (data) => {
       console.log('Received queue_position:', data);
@@ -169,10 +168,48 @@ const TerminalComponent = ({ studentId }) => {
     terminal.current.write('\x1b[u'); // Restore cursor position
   };
 
+  const handleDownload = async (command, args, studentId, currentDirectory) => {
+    const url = command === 'download' ? 'http://localhost:5000/download' : 'http://localhost:5000/download_gitea';
+    const downloadName = command === 'download' ? `${studentId}.zip` : `${studentId} (all versions).zip`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ studentId, sid: socket.current.id, folder_name: args[0] })
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadUrl;
+        a.download = downloadName;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        socket.current.emit('command_output', { message: `Download ${command === 'download' ? '' : 'from Gitea '}completed.`, current_directory: currentDirectory });
+      } else {
+        socket.current.emit('command_output', { message: `Error during ${command === 'download' ? '' : 'from Gitea '}download.`, current_directory: currentDirectory });
+      }
+    } catch (error) {
+      console.error(`Error during ${command === 'download' ? '' : 'from Gitea '}download:`, error);
+      socket.current.emit('command_output', { message: `Error during ${command === 'download' ? '' : 'from Gitea '}download: ${error.message}`, current_directory: currentDirectory });
+    }
+  };
+
   const handleCommand = (input) => {
     const [command, ...args] = input.split(' ');
-    console.log('Emitting execute_command:', { command, args, studentId });  // Log emitted command
-    socket.current.emit('execute_command', { command, args, studentId });
+
+    if (command === 'download' || command === 'downloadgitea') {
+      handleDownload(command, args, studentId, currentDirectory);
+    } else {
+      console.log('Emitting execute_command:', { command, args, studentId });
+      socket.current.emit('execute_command', { command, args, studentId });
+    }
   };
 
   const handleKeyPress = (e) => {

@@ -27,7 +27,8 @@ const commands = {
     { description: 'Changer de répertoire', command: 'cd nom_du_repertoire / cd ..' },
     { description: 'Créer un répertoire', command: 'mkdir nom_du_repertoire' },
     { description: 'Voir la liste des dernières versions disponible sur gitea', command: 'listgitea' },
-    { description: 'Télécharger un dossier gitea (Non fonctionnel)', command: 'download nom_du_dossiers' },
+    { description: 'Télécharger le dossier', command: 'download' },
+    { description: 'Télécharger toutes les versions du dossier', command: 'downloadgitea' },
   ];
   
   export { commands, commonCommands };

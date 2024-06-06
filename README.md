@@ -12,6 +12,7 @@
 - Envoie de commande à un serveur FLASK 
 - Fenetre pop up avec la liste des commandes
 - dossier et fichiers de configurations du terminal
+- Bouton d'envoie de dossier vers gitea
 
 ## Dépot du serveur lié à ce terminal 
 

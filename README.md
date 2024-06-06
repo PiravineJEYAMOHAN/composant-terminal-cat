@@ -33,11 +33,8 @@ services:
     volumes:
       - ./serveur-flask-cat/config:/app/config
       - ./dossier_etudiant:/app/dossier_etudiant
-      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - default
-    environment:
-      - DOCKER_BUILDKIT=1
 
   terminal:
     build: ./composant-terminal-cat

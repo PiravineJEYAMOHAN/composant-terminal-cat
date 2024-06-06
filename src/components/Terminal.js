@@ -3,11 +3,9 @@ import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { io } from 'socket.io-client';
 import settings from '../config/settings';
-import CommandListPopup from './CommandListPopup';
 
 const TerminalComponent = ({ studentId }) => {
   const terminalRef = useRef(null);
-  const [showHelp, setShowHelp] = useState(false);
   const terminalActive = useRef(true);
   const terminal = useRef(null);
   const commandBuffer = useRef('');
@@ -35,28 +33,30 @@ const TerminalComponent = ({ studentId }) => {
     });
 
     socket.current.on('command_output', (data) => {
-      console.log('Received command_output:', data);  // Log received data
-      if (data.message) {
-        console.log('Execution message:', data.message);  // Log execution message
-        terminal.current.write(data.message.replace(/\r?\n/g, '\r\n') + '\r\n');
-      } else {
-        if (data.output) {
-          console.log('Command output:', data.output);  // Log command output
-          terminal.current.write(data.output.replace(/\r?\n/g, '\r\n') + '\r\n');
-        }
-        if (data.error) {
-          console.log('Command error:', data.error);  // Log command error
-          terminal.current.write(data.error.replace(/\r?\n/g, '\r\n') + '\r\n');
-        }
-        if (data.current_directory) {
-          setCurrentDirectory(data.current_directory);
-          updatePrompt(data.current_directory);
-        } else {
-          updatePrompt();
-        }
-        terminalActive.current = true;
-      }
-    });
+        console.log('Received command_output:', data);  // Log received data
+        
+          if (data.message) {
+            console.log('Execution message:', data.message);  // Log execution message
+            terminal.current.write(data.message.replace(/\r?\n/g, '\r\n') + '\r\n');
+          } else {
+            if (data.output) {
+              console.log('Command output:', data.output);  // Log command output
+              terminal.current.write(data.output.replace(/\r?\n/g, '\r\n') + '\r\n');
+            }
+            if (data.error) {
+              console.log('Command error:', data.error);  // Log command error
+              terminal.current.write(data.error.replace(/\r?\n/g, '\r\n') + '\r\n');
+            }
+            if (data.current_directory) {
+              setCurrentDirectory(data.current_directory);
+              updatePrompt(data.current_directory);
+            } else {
+              updatePrompt();
+            }
+            terminalActive.current = true;
+          }
+    }
+    );
 
     socket.current.on('queue_position', (data) => {
       console.log('Received queue_position:', data);

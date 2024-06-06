@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import Terminal from './components/Terminal';
 import CommandListPopup from './components/CommandListPopup';
+import SendToGiteaButton from './components/SendToGiteaButton'; // Import the new component
 import settings from './config/settings';
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
             )}
             {showHelp && <CommandListPopup />}
             <Terminal studentId={studentId} />
+            <SendToGiteaButton studentId={studentId} /> {/* Add the new button here */}
           </div>
         </>
       )}

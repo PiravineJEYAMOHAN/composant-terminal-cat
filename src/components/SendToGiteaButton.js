@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { Box, Button } from '@chakra-ui/react';
 
 const SendToGiteaButton = ({ studentId }) => {
     const handleSendToGitea = async () => {
@@ -18,9 +19,16 @@ const SendToGiteaButton = ({ studentId }) => {
     };
 
     return (
-        <button onClick={handleSendToGitea}>
-            Envoyer à Gitea
-        </button>
+        <Box mt={2}>
+            <Button
+                onClick={handleSendToGitea}
+                color={"green.500"}
+                border={"1px solid"}
+                _hover={{bg: "green.900", color: "white", borderColor: "green.500"}}
+            >
+                Envoyer à Gitea
+            </Button>
+        </Box>
     );
 };
 

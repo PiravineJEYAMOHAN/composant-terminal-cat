@@ -3,6 +3,7 @@ import './App.css';
 import Terminal from './components/Terminal';
 import CommandListPopup from './components/CommandListPopup';
 import SendToGiteaButton from './components/SendToGiteaButton'; // Import the new component
+import { ChakraProvider, Text, Input, Button } from '@chakra-ui/react';
 import settings from './config/settings';
 
 function App() {
@@ -16,45 +17,34 @@ function App() {
   };
 
   return (
+    <ChakraProvider>
     <div className="App">
       {!showTerminal ? (
         <form onSubmit={handleStudentIdSubmit}>
           <h1>Entrez votre numéro étudiant</h1>
-          <input
+          <Input 
             type="text"
+            width="10%"
             value={studentId}
             onChange={(e) => setStudentId(e.target.value)}
             required
           />
-          <button type="submit">Commencer</button>
+          <br/>
+          <Button type="submit">Commencer</Button>
         </form>
       ) : (
         <>
-          <h1>Terminal</h1>
+          <Text fontSize="5xl">Terminal</Text>
           <div className="TerminalContainer">
-            {settings.showHelpButton && (
-              <button
-                onClick={() => setShowHelp(!showHelp)}
-                style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  zIndex: '9999',
-                }}
-              >
-                Aide
-              </button>
-            )}
-            {showHelp && <CommandListPopup />}
+            <SendToGiteaButton studentId={studentId} />
+            <CommandListPopup />
             <Terminal studentId={studentId} />
-            <SendToGiteaButton studentId={studentId} /> {/* Add the new button here */}
+            
           </div>
         </>
       )}
     </div>
+    </ChakraProvider>
   );
 }
 

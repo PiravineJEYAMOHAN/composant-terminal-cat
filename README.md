@@ -68,6 +68,10 @@ npm install socket.io-client
 
 npm install @chakra-ui/react
 
+npm i @chakra-ui/icons
+
+npm install @emotion/react@^11.11.4 @emotion/styled@^11.11.5
+
 
 ## Bibliothèques / API / outils utilisées
 

@@ -223,7 +223,7 @@ const TerminalComponent = ({ studentId }) => {
   };
 
   return (
-    <div style={{ textAlign: 'left' }}>
+    <div style={{ textAlign: 'left', marginTop : '5px' }}>
       <div
         ref={terminalRef}
         onKeyDown={handleKeyPress}

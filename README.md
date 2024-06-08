@@ -13,6 +13,7 @@
 - Fenetre pop up avec la liste des commandes
 - dossier et fichiers de configurations du terminal
 - Bouton d'envoie de dossier vers gitea
+- Fichiers de configurations 
 
 ## Dépot du serveur lié à ce terminal 
 
@@ -20,20 +21,24 @@
 
 
 ## Execution (du terminal et du serveur à la fois)
-- Ouvrir Docker Desktop
+- Ouvrir Docker Desktop 
 - Cloner le projet composant-terminal-cat dans un dossier nommé CAT, cloner aussi le projet serveur-flask-cat dans ce dossier CAT
 - Créer dans le dossier CAT un fichier nommé docker-compose.yml avec le contenu suivant : 
 
 ```yaml
-version: '3'
+version: '3.8'
+
 services:
   server:
-    build: ./serveur-flask-cat
+    build:
+      context: ./serveur-flask-cat
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
     volumes:
       - ./serveur-flask-cat/config:/app/config
-      - ./dossier_etudiant:/app/dossier_etudiant
+      - ./serveur-flask-cat/dossier_etudiant:/app/dossier_etudiant
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - default
 
@@ -44,9 +49,37 @@ services:
     networks:
       - default
 
+  c:
+    build:
+      context: ./serveur-flask-cat/config/dockerfiles
+      dockerfile: Dockerfile.c
+    networks:
+      - default
+    volumes:
+      - ./serveur-flask-cat/dossier_etudiant:/app/dossier_etudiant
+
+  python:
+    build:
+      context: ./serveur-flask-cat/config/dockerfiles
+      dockerfile: Dockerfile.python
+    networks:
+      - default
+    volumes:
+      - ./serveur-flask-cat/dossier_etudiant:/app/dossier_etudiant
+
+  java:
+    build:
+      context: ./serveur-flask-cat/config/dockerfiles
+      dockerfile: Dockerfile.java
+    networks:
+      - default
+    volumes:
+      - ./serveur-flask-cat/dossier_etudiant:/app/dossier_etudiant
+
 networks:
   default:
     driver: bridge
+
 
 ```
 

@@ -208,7 +208,7 @@ const TerminalComponent = ({ studentId }) => {
       handleDownload(command, args, studentId, currentDirectory);
     } else {
       console.log('Emitting execute_command:', { command, args, studentId });
-      socket.current.emit('execute_command', { command, args, studentId });
+      socket.current.emit('execute_command', { command, args, studentId, language: settings.language });
     }
   };
 
